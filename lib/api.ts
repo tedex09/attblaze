@@ -1,17 +1,13 @@
 import axios from 'axios';
-import { useQuery } from '@tanstack/react-query';
 
 // API endpoints
 const BASE_URL = 'https://clintkz.xyz/player_api.php';
 
-// Create axios instance
-const api = axios.create({
-  baseURL: BASE_URL,
-  params: {
-    username: 'josemar2024',
-    password: '987973496'
-  }
-});
+// API parameters
+const API_PARAMS = {
+  username: 'josemar2024',
+  password: '987973496'
+};
 
 // Types
 export interface Channel {
@@ -105,93 +101,75 @@ export interface EPGEntry {
   stop_timestamp: number;
 }
 
-// API functions with React Query hooks
-export function useLiveStreams() {
-  return useQuery({
-    queryKey: ['live-streams'],
-    queryFn: async () => {
-      const { data } = await api.get('', { params: { action: 'get_live_streams' } });
-      return data as Channel[];
-    },
-    staleTime: 1000 * 60 * 60, // 1 hour
+// API functions
+export async function getLiveStreams(): Promise<Channel[]> {
+  const { data } = await axios.get(BASE_URL, {
+    params: {
+      ...API_PARAMS,
+      action: 'get_live_streams'
+    }
   });
+  return data;
 }
 
-export function useVodStreams() {
-  return useQuery({
-    queryKey: ['vod-streams'],
-    queryFn: async () => {
-      const { data } = await api.get('', { params: { action: 'get_vod_streams' } });
-      return data as Movie[];
-    },
-    staleTime: 1000 * 60 * 60, // 1 hour
+export async function getVodStreams(): Promise<Movie[]> {
+  const { data } = await axios.get(BASE_URL, {
+    params: {
+      ...API_PARAMS,
+      action: 'get_vod_streams'
+    }
   });
+  return data;
 }
 
-export function useSeries() {
-  return useQuery({
-    queryKey: ['series'],
-    queryFn: async () => {
-      const { data } = await api.get('', { params: { action: 'get_series' } });
-      return data as Series[];
-    },
-    staleTime: 1000 * 60 * 60, // 1 hour
+export async function getSeries(): Promise<Series[]> {
+  const { data } = await axios.get(BASE_URL, {
+    params: {
+      ...API_PARAMS,
+      action: 'get_series'
+    }
   });
+  return data;
 }
 
-export function useSeriesInfo(seriesId: number) {
-  return useQuery({
-    queryKey: ['series-info', seriesId],
-    queryFn: async () => {
-      const { data } = await api.get('', {
-        params: {
-          action: 'get_series_info',
-          series_id: seriesId
-        }
-      });
-      return data as SeriesInfo;
-    },
-    staleTime: 1000 * 60 * 60, // 1 hour
-    enabled: !!seriesId,
+export async function getSeriesInfo(seriesId: number): Promise<SeriesInfo> {
+  const { data } = await axios.get(BASE_URL, {
+    params: {
+      ...API_PARAMS,
+      action: 'get_series_info',
+      series_id: seriesId
+    }
   });
+  return data;
 }
 
-export function useEPG() {
-  return useQuery({
-    queryKey: ['epg'],
-    queryFn: async () => {
-      const { data } = await api.get('', {
-        params: {
-          action: 'get_simple_data_table',
-          stream_id: 'ALL'
-        }
-      });
-      return data as EPGEntry[];
-    },
-    staleTime: 1000 * 60 * 15, // 15 minutes
+export async function getEPG(): Promise<EPGEntry[]> {
+  const { data } = await axios.get(BASE_URL, {
+    params: {
+      ...API_PARAMS,
+      action: 'get_simple_data_table',
+      stream_id: 'ALL'
+    }
   });
+  return data;
 }
 
 export function getStreamUrl(streamId: number, streamType: 'live' | 'movie' | 'series', episodeId?: string): string {
-  const baseUrl = 'https://clintkz.xyz/';
   const params = new URLSearchParams({
-    username: 'josemar2024',
-    password: '987973496'
+    ...API_PARAMS,
+    stream_id: streamId.toString()
   });
 
   if (streamType === 'live') {
     params.append('action', 'get_live_streams');
-    params.append('stream_id', streamId.toString());
   } else if (streamType === 'movie') {
     params.append('action', 'get_vod_streams');
-    params.append('stream_id', streamId.toString());
   } else {
     params.append('action', 'get_series_info');
-    params.append('series_id', streamId.toString());
     if (episodeId) {
       params.append('episode_id', episodeId);
     }
   }
 
-  return `${baseUrl}?${params.toString()}`;
+  return `${BASE_URL}?${params.toString()}`;
 }

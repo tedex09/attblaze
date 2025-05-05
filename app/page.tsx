@@ -6,7 +6,7 @@ import Navbar from '@/components/navbar';
 import Loading from '@/components/loading';
 
 export default async function Home() {
-  // Fetch data for home page
+  // Fetch data for home page app
   const [channels, movies, series] = await Promise.all([
     getLiveStreams(),
     getVodStreams(),
