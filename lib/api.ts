@@ -1,6 +1,17 @@
+import axios from 'axios';
+import { useQuery } from '@tanstack/react-query';
+
 // API endpoints
 const BASE_URL = 'https://clintkz.xyz/player_api.php';
-const AUTH_PARAMS = 'username=josemar2024&password=987973496';
+
+// Create axios instance
+const api = axios.create({
+  baseURL: BASE_URL,
+  params: {
+    username: 'josemar2024',
+    password: '987973496'
+  }
+});
 
 // Types
 export interface Channel {
@@ -94,98 +105,93 @@ export interface EPGEntry {
   stop_timestamp: number;
 }
 
-// API functions with ISR caching
-export async function getLiveStreams(): Promise<Channel[]> {
-  try {
-    const response = await fetch(`${BASE_URL}?${AUTH_PARAMS}&action=get_live_streams`, {
-      next: { revalidate: 3600 } // Cache for 1 hour
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch live streams');
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching live streams:', error);
-    return [];
-  }
+// API functions with React Query hooks
+export function useLiveStreams() {
+  return useQuery({
+    queryKey: ['live-streams'],
+    queryFn: async () => {
+      const { data } = await api.get('', { params: { action: 'get_live_streams' } });
+      return data as Channel[];
+    },
+    staleTime: 1000 * 60 * 60, // 1 hour
+  });
 }
 
-export async function getVodStreams(): Promise<Movie[]> {
-  try {
-    const response = await fetch(`${BASE_URL}?${AUTH_PARAMS}&action=get_vod_streams`, {
-      next: { revalidate: 3600 }
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch VOD streams');
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching VOD streams:', error);
-    return [];
-  }
+export function useVodStreams() {
+  return useQuery({
+    queryKey: ['vod-streams'],
+    queryFn: async () => {
+      const { data } = await api.get('', { params: { action: 'get_vod_streams' } });
+      return data as Movie[];
+    },
+    staleTime: 1000 * 60 * 60, // 1 hour
+  });
 }
 
-export async function getSeries(): Promise<Series[]> {
-  try {
-    const response = await fetch(`${BASE_URL}?${AUTH_PARAMS}&action=get_series`, {
-      next: { revalidate: 3600 }
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch series');
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching series:', error);
-    return [];
-  }
+export function useSeries() {
+  return useQuery({
+    queryKey: ['series'],
+    queryFn: async () => {
+      const { data } = await api.get('', { params: { action: 'get_series' } });
+      return data as Series[];
+    },
+    staleTime: 1000 * 60 * 60, // 1 hour
+  });
 }
 
-export async function getSeriesInfo(seriesId: number): Promise<SeriesInfo | null> {
-  try {
-    const response = await fetch(`${BASE_URL}?${AUTH_PARAMS}&action=get_series_info&series_id=${seriesId}`, {
-      next: { revalidate: 3600 }
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch series info');
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error(`Error fetching series info for ID ${seriesId}:`, error);
-    return null;
-  }
+export function useSeriesInfo(seriesId: number) {
+  return useQuery({
+    queryKey: ['series-info', seriesId],
+    queryFn: async () => {
+      const { data } = await api.get('', {
+        params: {
+          action: 'get_series_info',
+          series_id: seriesId
+        }
+      });
+      return data as SeriesInfo;
+    },
+    staleTime: 1000 * 60 * 60, // 1 hour
+    enabled: !!seriesId,
+  });
 }
 
-export async function getEPG(): Promise<EPGEntry[]> {
-  try {
-    const response = await fetch(`${BASE_URL}?${AUTH_PARAMS}&action=get_simple_data_table&stream_id=ALL`, {
-      next: { revalidate: 900 } // Cache for 15 minutes for more up-to-date game info
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch EPG data');
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching EPG data:', error);
-    return [];
-  }
+export function useEPG() {
+  return useQuery({
+    queryKey: ['epg'],
+    queryFn: async () => {
+      const { data } = await api.get('', {
+        params: {
+          action: 'get_simple_data_table',
+          stream_id: 'ALL'
+        }
+      });
+      return data as EPGEntry[];
+    },
+    staleTime: 1000 * 60 * 15, // 15 minutes
+  });
 }
 
 export function getStreamUrl(streamId: number, streamType: 'live' | 'movie' | 'series', episodeId?: string): string {
+  const baseUrl = 'https://clintkz.xyz/';
+  const params = new URLSearchParams({
+    username: 'josemar2024',
+    password: '987973496'
+  });
+
   if (streamType === 'live') {
-    return `https://clintkz.xyz/${AUTH_PARAMS}&action=get_live_streams&stream_id=${streamId}`;
+    params.append('action', 'get_live_streams');
+    params.append('stream_id', streamId.toString());
   } else if (streamType === 'movie') {
-    return `https://clintkz.xyz/${AUTH_PARAMS}&action=get_vod_streams&stream_id=${streamId}`;
+    params.append('action', 'get_vod_streams');
+    params.append('stream_id', streamId.toString());
   } else {
-    return `https://clintkz.xyz/${AUTH_PARAMS}&action=get_series_info&series_id=${streamId}&episode_id=${episodeId}`;
+    params.append('action', 'get_series_info');
+    params.append('series_id', streamId.toString());
+    if (episodeId) {
+      params.append('episode_id', episodeId);
+    }
   }
+
+  return `${baseUrl}?${params.toString()}`;
 }
