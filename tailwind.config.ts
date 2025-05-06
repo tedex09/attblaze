@@ -13,7 +13,10 @@ const config: Config = {
         sans: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
       },
       colors: {
-        background: '#000000',
+        background: '#0f0f0f',
+        foreground: '#ffffff',
+        muted: '#1f1f1f',
+        'muted-foreground': '#a1a1aa',
         primary: {
           DEFAULT: '#e50914',
           hover: '#f40612',
@@ -25,7 +28,7 @@ const config: Config = {
         },
       },
       borderRadius: {
-        'card': '8px',
+        'card': '0.75rem',
         'modal': '12px',
         'full': '50%',
       },

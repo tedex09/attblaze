@@ -47,7 +47,7 @@
 }
 
 .premium-channel {
-  @apply relative overflow-hidden rounded-full bg-secondary shadow-premium transition-transform duration-200 ease-out;
+  @apply relative overflow-hidden rounded-md bg-secondary shadow-premium transition-transform duration-200 ease-out;
 }
 
 .premium-channel:hover {
