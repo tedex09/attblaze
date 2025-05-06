@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import { Providers } from './providers';
 import { MobileNav } from '@/components/layout/MobileNav';
+import { Header } from '@/components/layout/Header';
 
 const poppins = Poppins({ 
   subsets: ['latin'],
@@ -23,7 +24,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={poppins.variable}>
       <body className="bg-background font-sans text-text-primary antialiased">
-        <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pb-16 md:pb-0">
+        <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pb-20 md:pb-0">
+          <Header />
           <Providers>{children}</Providers>
           <MobileNav />
         </div>

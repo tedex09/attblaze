@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { usePathname } from 'next/navigation';
+import { motion } from 'framer-motion';
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,61 +18,44 @@ export function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 hidden md:block ${
         isScrolled ? 'bg-background/95 backdrop-blur-md' : 'bg-transparent'
       }`}
     >
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <Link href="/" className="focus-premium">
-          <h1 className="text-2xl font-bold text-primary">PREMIUM</h1>
-        </Link>
+      <div className="container mx-auto px-6 py-4">
+        <nav className="flex items-center gap-8">
+          <Link href="/" className="text-2xl font-bold text-primary">
+            IPTV
+          </Link>
 
-        <button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="touch-target md:hidden focus-premium"
-          aria-label="Toggle menu"
-        >
-          <Menu className="w-6 h-6" />
-        </button>
-
-        <nav className="hidden md:flex items-center space-x-8">
-          <NavLink href="/movies">Movies</NavLink>
-          <NavLink href="/series">Series</NavLink>
-          <NavLink href="/live">Live TV</NavLink>
-          <NavLink href="/sports">Sports</NavLink>
+          <div className="flex items-center gap-6">
+            <NavLink href="/" label="Watch Now" isActive={pathname === '/'} />
+            <NavLink href="/store" label="Store" isActive={pathname === '/store'} />
+            <NavLink href="/sports" label="Sports" isActive={pathname === '/sports'} />
+            <NavLink href="/library" label="Library" isActive={pathname === '/library'} />
+          </div>
         </nav>
       </div>
-
-      <AnimatePresence>
-        {isMenuOpen && <MobileMenu onClose={() => setIsMenuOpen(false)} />}
-      </AnimatePresence>
     </header>
   );
 }
 
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
+function NavLink({ href, label, isActive }: { href: string; label: string; isActive: boolean }) {
   return (
     <Link
       href={href}
-      className="text-text-secondary hover:text-text-primary transition-colors focus-premium"
+      className={`relative text-sm font-medium transition-colors hover:text-white ${
+        isActive ? 'text-white' : 'text-zinc-400'
+      }`}
     >
-      {children}
+      {label}
+      {isActive && (
+        <motion.div
+          layoutId="activeNavLink"
+          className="absolute -bottom-1 left-0 right-0 h-0.5 bg-white rounded-full"
+          transition={{ type: "spring", stiffness: 380, damping: 30 }}
+        />
+      )}
     </Link>
-  );
-}
-
-function MobileMenu({ onClose }: { onClose: () => void }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="absolute top-full left-0 right-0 bg-secondary/95 backdrop-blur-md p-4 flex flex-col space-y-4 md:hidden"
-    >
-      <NavLink href="/movies">Movies</NavLink>
-      <NavLink href="/series">Series</NavLink>
-      <NavLink href="/live">Live TV</NavLink>
-      <NavLink href="/sports">Sports</NavLink>
-    </motion.div>
   );
 }
