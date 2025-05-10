@@ -15,9 +15,21 @@
 @layer base {
   body {
     @apply bg-background text-text-primary;
-    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+
+/* Background Principal */
+.bg-tvplus-radial {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(54, 53, 53, 0.3) 0%,
+    rgba(20, 20, 20, 0.6) 40%,
+    rgba(10, 10, 10, 0.95) 100%
+  );
+  background-color: #0a0a0a;
+}
+
+
 
 @layer utilities {
   .snap-x {
@@ -39,67 +51,26 @@
 }
 
 .premium-card {
-  @apply relative overflow-hidden rounded-card bg-secondary/80 backdrop-blur-sm shadow-premium transition-all duration-300 ease-out hover:scale-105;
+  @apply relative overflow-hidden rounded-card bg-secondary shadow-premium transition-transform duration-300 ease-out;
+}
+
+.premium-card:hover {
+  @apply transform scale-105;
 }
 
 .premium-channel {
-  @apply relative overflow-hidden rounded-md bg-secondary/80 backdrop-blur-sm shadow-premium transition-all duration-200 ease-out hover:scale-110;
+  @apply relative overflow-hidden rounded-md bg-secondary shadow-premium transition-transform duration-200 ease-out;
+}
+
+.premium-channel:hover {
+  @apply transform scale-110;
 }
 
 .bottom-sheet {
-  @apply fixed bottom-0 left-0 right-0 z-50 rounded-t-[20px] bg-black/95 backdrop-blur-md shadow-premium;
+  @apply fixed bottom-0 left-0 right-0 z-50 rounded-t-[20px] bg-black/95 shadow-premium;
   height: 75vh;
 }
 
 .mobile-nav {
-  @apply fixed bottom-0 left-0 right-0 z-40 bg-secondary/95 backdrop-blur-md border-t border-zinc-800 md:hidden;
-}
-
-/* Modern Loading Skeletons */
-.skeleton {
-  @apply animate-pulse bg-zinc-800/50 rounded-md;
-}
-
-.skeleton-text {
-  @apply h-4 bg-zinc-800/50 rounded-md animate-pulse;
-}
-
-/* Modern Dialog/Sheet Animations */
-.dialog-overlay {
-  @apply fixed inset-0 bg-black/80 backdrop-blur-sm transition-all duration-300;
-}
-
-.dialog-content {
-  @apply fixed left-[50%] top-[50%] z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl bg-zinc-900/95 p-6 shadow-xl backdrop-blur-sm transition-all duration-300;
-}
-
-.sheet-content {
-  @apply fixed bottom-0 left-0 right-0 z-50 rounded-t-[20px] bg-zinc-900/95 p-6 shadow-xl backdrop-blur-sm transition-all duration-300;
-}
-
-/* Modern Card Hover Effects */
-.content-card {
-  @apply relative overflow-hidden rounded-lg transition-all duration-300;
-}
-
-.content-card::after {
-  @apply absolute inset-0 bg-gradient-to-t from-black/80 via-transparent opacity-0 transition-opacity duration-300;
-  content: '';
-}
-
-.content-card:hover::after {
-  @apply opacity-100;
-}
-
-/* Modern Navigation Styles */
-.nav-link {
-  @apply relative flex flex-col items-center justify-center p-2 text-zinc-400 transition-colors duration-200 hover:text-white;
-}
-
-.nav-link.active {
-  @apply text-white;
-}
-
-.nav-link.active::after {
-  @apply absolute bottom-0 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-primary content-[''];
+  @apply fixed bottom-0 left-0 right-0 z-40 bg-secondary/95 backdrop-blur-md md:hidden;
 }

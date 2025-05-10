@@ -36,6 +36,7 @@ export interface Movie {
   container_extension: string;
   custom_sid: string;
   direct_source: string;
+  last_modified: string;
 }
 
 export interface Series {

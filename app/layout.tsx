@@ -1,19 +1,22 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Poppins } from 'next/font/google';
+import { Nunito } from "next/font/google";
 import { Providers } from './providers';
 import { MobileNav } from '@/components/layout/MobileNav';
-import { Header } from '@/components/layout/Header';
+import Navbar from '@/components/navbar';
+import Logo from "@/components/ui/logo";
+import { ShapeBG } from '@/components/ui/shape-bg';
 
-const poppins = Poppins({ 
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-poppins'
+const nunito = Nunito({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-sans",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: 'Premium Streaming Platform',
-  description: 'A premium streaming experience',
+  title: 'HUB',
+  description: 'Portal de atualizações de conteudos',
 };
 
 export default function RootLayout({
@@ -22,13 +25,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={poppins.variable}>
-      <body className="bg-background font-sans text-text-primary antialiased">
-        <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background pb-20 md:pb-0">
-          <Header />
-          <Providers>{children}</Providers>
-          <MobileNav />
-        </div>
+    <html lang="en" className={nunito.variable}>
+      <body className="bg-tvplus font-sans text-text-primary antialiased">
+        <Logo />
+        <Navbar />
+        <ShapeBG />  
+        
+        <Providers>{children}</Providers>
+        <div className="w-screen flex justify-center"><MobileNav /></div>
       </body>
     </html>
   );
