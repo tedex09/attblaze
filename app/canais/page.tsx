@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { AutoSizer, Grid } from 'react-virtualized';
-import { getVodStreams } from '@/lib/api';
+import { getLiveStreams } from '@/lib/api';
 import { SkeletonImage } from '@/components/skeletonImage';
 import Loading from '@/components/loading';
 import Link from 'next/link';
@@ -15,22 +15,23 @@ function removeInvalidOrDuplicateStreamIds<T extends { stream_id: number }>(item
     return true;
   });
 }
-export default function MoviesPage() {
-  const [movies, setMovies] = useState<any[]>([]);
+
+export default function ChannelsPage() {
+  const [channels, setChannels] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [columnCount, setColumnCount] = useState(2);
 
   useEffect(() => {
-    const fetchMovies = async () => {
-      const data = await getVodStreams();
-      const sortedMovies = removeInvalidOrDuplicateStreamIds(
+    const fetchChannels = async () => {
+      const data = await getLiveStreams();
+      const sortedChannels = removeInvalidOrDuplicateStreamIds(
         [...data].sort((a, b) => b.stream_id - a.stream_id)
       ).slice(0, 50);
-      setMovies(sortedMovies);
+      setChannels(sortedChannels);
       setLoading(false);
     };
 
-    fetchMovies();
+    fetchChannels();
   }, []);
 
   useEffect(() => {
@@ -49,27 +50,27 @@ export default function MoviesPage() {
 
   const cellRenderer = ({ columnIndex, key, rowIndex, style }: any) => {
     const index = rowIndex * columnCount + columnIndex;
-    if (index >= movies.length) return null;
+    if (index >= channels.length) return null;
 
-    const movie = movies[index];
+    const channel = channels[index];
 
     return (
       <div key={key} style={style}>
         <Link 
-          href={`/details/movie/${movie.stream_id}`}
+          href={`/details/channel/${channel.stream_id}`}
           className="group block p-2"
         >
-          <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-zinc-800">
-            {movie.stream_icon ? (
+          <div className="relative aspect-square rounded-md md:rounded-3xl overflow-hidden bg-zinc-800">
+            {channel.stream_icon ? (
               <SkeletonImage
-                src={movie.stream_icon}
-                alt={movie.name}
+                src={channel.stream_icon}
+                alt={channel.name}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-110"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <span className="text-zinc-500 text-sm px-2 text-center">{movie.name}</span>
+                <span className="text-white font-bold text-sm px-2 text-center">{channel.name}</span>
               </div>
             )}
           </div>
@@ -80,14 +81,14 @@ export default function MoviesPage() {
 
   if (loading) return <Loading />;
 
-  const rowCount = Math.ceil(movies.length / columnCount);
+  const rowCount = Math.ceil(channels.length / columnCount);
 
   return (
     <main className="min-h-screen">
       <section className="pt-4 pb-16">
         <div className="px-4 py-4">
-          <h1 className="text-2xl font-bold mb-2">Últimos filmes adicionados</h1>
-          <p className="text-zinc-400 text-sm font-light mb-6">Os filmes mais recentes adicionados à nossa coleção</p>
+          <h1 className="text-2xl font-bold mb-2">Últimos canais adicionados</h1>
+          <p className="text-zinc-400 text-sm font-light mb-6">Os canais mais recentes adicionados à nossa grade</p>
         </div>
         
         <div className="relative h-[calc(100vh-200px)]">
@@ -99,7 +100,7 @@ export default function MoviesPage() {
                 columnWidth={width / columnCount}
                 height={height}
                 rowCount={rowCount}
-                rowHeight={((width / columnCount) * 3) / 2}
+                rowHeight={width / columnCount}
                 width={width}
               />
             )}
